@@ -10,6 +10,7 @@ export const loginValidator = (req: Request, res: Response, next: NextFunction) 
       error: 'Missing email or password'
     })
   }
+  // OK thì mới next()
   next()
 }
 
@@ -74,7 +75,9 @@ export const registerValidator = validate(
         options: {
           minLength: 6,
           minLowercase: 1,
-          minUppercase: 1
+          minUppercase: 1,
+          minNumbers: 1,
+          minSymbols: 1
         },
         errorMessage:
           'Password must be at least 6 characters and contain at least 1 lowercase, 1 uppercase, 1 number and 1 symbol'

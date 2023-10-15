@@ -24,6 +24,7 @@ class DatabaseService {
     }
   }
 
+  // Dựa vào geter, seter để truy cập và thêm, sửa... bảng đó
   get users(): Collection<User> {
     return this.db.collection(process.env.DB_COLLECTION_USERS as string)
   }
