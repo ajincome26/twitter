@@ -17,7 +17,6 @@ export const registerController = async (
   res: Response,
   next: NextFunction
 ) => {
-  // throw new Error('loi roi =))')
   const result = await usersServices.register(req.body)
   return res.json({
     message: 'Register Success',
