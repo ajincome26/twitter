@@ -1,9 +1,13 @@
+import { config } from 'dotenv'
+import { ObjectId } from 'mongodb'
 import { TokenType } from '~/constants/enums'
 import { RegisterReqBody } from '~/models/Requests/User.requests'
+import RefreshToken from '~/models/schemas/RefreshToken.schema'
 import User from '~/models/schemas/User.schema'
 import { hashPassword } from '~/utils/crypto'
 import { signToken } from '~/utils/jwt'
 import databaseService from './database.services'
+config()
 
 class UsersService {
   private signAccessToken(user_id: string) {
@@ -41,6 +45,9 @@ class UsersService {
     )
     const user_id = result.insertedId.toString()
     const [access_token, refresh_token] = await this.signAccessTokenAndRefreshToken(user_id)
+    await databaseService.refreshTokens.insertOne(
+      new RefreshToken(new RefreshToken({ user_id: new ObjectId(user_id), token: refresh_token }))
+    )
     return { access_token, refresh_token }
   }
   async checkExistEmail(email: string) {
@@ -49,6 +56,9 @@ class UsersService {
   }
   async login(user_id: string) {
     const [access_token, refresh_token] = await this.signAccessTokenAndRefreshToken(user_id)
+    await databaseService.refreshTokens.insertOne(
+      new RefreshToken(new RefreshToken({ user_id: new ObjectId(user_id), token: refresh_token }))
+    )
     return { access_token, refresh_token }
   }
 }
