@@ -2,11 +2,13 @@ import { NextFunction, Request, Response } from 'express'
 import usersServices from '~/services/users.services'
 import { ParamsDictionary } from 'express-serve-static-core'
 import {
+  ForgotPasswordReqBody,
   LoginReqBody,
   LogoutReqBody,
   RegisterReqBody,
   TokenPayload,
-  VerifyEmailReqBody
+  VerifyEmailReqBody,
+  VerifyForgotPasswordReqBody
 } from '~/models/Requests/User.requests'
 import { ObjectId } from 'mongodb'
 import User from '~/models/schemas/User.schema'
@@ -83,4 +85,22 @@ export const resendVerifyEmailController = async (req: Request, res: Response, n
   }
   const result = await usersServices.resendVerifyEmail(user_id)
   return res.json(result)
+}
+export const forgotPasswordController = async (
+  req: Request<ParamsDictionary, any, ForgotPasswordReqBody>,
+  res: Response,
+  next: NextFunction
+) => {
+  const { _id, verify, email } = req.user as User
+  const result = await usersServices.forgotPassword({ user_id: (_id as ObjectId).toString(), verify, email })
+  return res.json(result)
+}
+export const verifyForgotPasswordController = async (
+  req: Request<ParamsDictionary, any, VerifyForgotPasswordReqBody>,
+  res: Response,
+  next: NextFunction
+) => {
+  return res.json({
+    message: USERS_MESSAGES.VERIFY_FORGOT_PASSWORD_SUCCESS
+  })
 }
