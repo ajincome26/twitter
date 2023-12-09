@@ -34,3 +34,14 @@ export interface ResetPasswordReqBody {
   confirm_password: string
   forgot_password_token: string
 }
+// Dùng PATCH nên dùng '?:'
+export interface UpdateMeReqBody {
+  name?: string
+  date_of_birth?: string // khi gửi lên kiểu ISO String
+  bio?: string
+  location?: string
+  website?: string
+  username?: string
+  avatar?: string
+  cover_photo?: string
+}
