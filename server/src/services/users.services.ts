@@ -5,6 +5,7 @@ import HTTP_STATUS from '~/constants/httpStatus'
 import { USERS_MESSAGES } from '~/constants/messages'
 import { ErrorWithStatus } from '~/models/Errors'
 import { RegisterReqBody, UpdateMeReqBody } from '~/models/Requests/User.requests'
+import Follower from '~/models/schemas/Follow.schema'
 import RefreshToken from '~/models/schemas/RefreshToken.schema'
 import User from '~/models/schemas/User.schema'
 import { hashPassword } from '~/utils/crypto'
@@ -91,7 +92,6 @@ class UsersService {
     await databaseService.refreshTokens.insertOne(
       new RefreshToken({ user_id: new ObjectId(user_id), token: refresh_token })
     )
-    console.log('email_verify_token', email_verify_token)
     return { access_token, refresh_token }
   }
   async checkExistEmail(email: string) {
@@ -168,7 +168,6 @@ class UsersService {
         }
       }
     ])
-    console.log('forgot_password_token', forgot_password_token)
     return {
       message: USERS_MESSAGES.CHECK_EMAIL_TO_RESET_PASSWORD
     }
@@ -249,6 +248,26 @@ class UsersService {
       })
     }
     return user
+  }
+  async follow(user_id: string, followed_user_id: string) {
+    const follower = await databaseService.followers.findOne({
+      user_id: new ObjectId(user_id),
+      followed_user_id: new ObjectId(followed_user_id)
+    })
+    if (follower === null) {
+      await databaseService.followers.insertOne(
+        new Follower({
+          user_id: new ObjectId(user_id),
+          followed_user_id: new ObjectId(followed_user_id)
+        })
+      )
+      return {
+        message: USERS_MESSAGES.FOLLOW_SUCCESS
+      }
+    }
+    return {
+      message: USERS_MESSAGES.FOLLOWED
+    }
   }
 }
 

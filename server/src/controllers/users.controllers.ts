@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from 'express'
 import usersServices from '~/services/users.services'
 import { ParamsDictionary } from 'express-serve-static-core'
 import {
+  FollowReqBody,
   ForgotPasswordReqBody,
   GetProfileReqParams,
   LoginReqBody,
@@ -145,4 +146,14 @@ export const getProfileController = async (req: Request<GetProfileReqParams>, re
     message: USERS_MESSAGES.GET_PROFILE_SUCCESS,
     result: user
   })
+}
+export const followController = async (
+  req: Request<ParamsDictionary, any, FollowReqBody>,
+  res: Response,
+  next: NextFunction
+) => {
+  const { user_id } = req.decoded_authorization as TokenPayload
+  const { followed_user_id } = req.body
+  const result = await usersServices.follow(user_id, followed_user_id)
+  return res.json(result)
 }
