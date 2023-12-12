@@ -52,3 +52,6 @@ export interface GetProfileReqParams extends ParamsDictionary {
 export interface FollowReqBody {
   followed_user_id: string
 }
+export interface UnfollowReqParams extends ParamsDictionary {
+  followed_user_id: string
+}

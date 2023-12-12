@@ -493,3 +493,11 @@ export const followValidator = validate(
     ['body']
   )
 )
+export const unfollowValidator = validate(
+  checkSchema(
+    {
+      followed_user_id: userIdSchema
+    },
+    ['params']
+  )
+)
