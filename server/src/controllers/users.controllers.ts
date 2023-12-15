@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express'
-import usersServices from '~/services/users.services'
+import usersService from '~/services/users.services'
 import { ParamsDictionary } from 'express-serve-static-core'
 import {
   ChangePasswordReqBody,
@@ -27,14 +27,14 @@ config()
 
 export const oauthController = async (req: Request, res: Response) => {
   const { code } = req.query
-  const result = await usersServices.oauth(code as string)
+  const result = await usersService.oauth(code as string)
   const urlRedirect = `${process.env.CLIENT_REDIRECT_CALLBACK}?access_token=${result.access_token}&refresh_token=${result.refresh_token}&new_user=${result.newUser}&verify=${result.verify}`
   return res.redirect(urlRedirect)
 }
 export const loginController = async (req: Request<ParamsDictionary, any, LoginReqBody>, res: Response) => {
   const user = req.user as User
   const user_id = user._id as ObjectId
-  const result = await usersServices.login({ user_id: user_id.toString(), verify: user.verify })
+  const result = await usersService.login({ user_id: user_id.toString(), verify: user.verify })
   return res.json({
     message: USERS_MESSAGES.LOGIN_SUCCESS,
     result
@@ -45,7 +45,7 @@ export const registerController = async (
   res: Response,
   next: NextFunction
 ) => {
-  const result = await usersServices.register(req.body)
+  const result = await usersService.register(req.body)
   return res.json({
     message: USERS_MESSAGES.REGISTER_SUCCESS,
     result
@@ -53,7 +53,7 @@ export const registerController = async (
 }
 export const logoutController = async (req: Request<ParamsDictionary, any, LogoutReqBody>, res: Response) => {
   const { refresh_token } = req.body
-  const result = await usersServices.logout(refresh_token)
+  const result = await usersService.logout(refresh_token)
   return res.json(result)
 }
 export const verifyEmailController = async (
@@ -78,7 +78,7 @@ export const verifyEmailController = async (
       message: USERS_MESSAGES.EMAIL_ALREADY_VERIFIED_BEFORE
     })
   }
-  const result = await usersServices.verifyEmail(user_id)
+  const result = await usersService.verifyEmail(user_id)
   return res.json({
     message: USERS_MESSAGES.EMAIL_VERIFY_SUCCESS,
     result
@@ -97,7 +97,7 @@ export const resendVerifyEmailController = async (req: Request, res: Response, n
       message: USERS_MESSAGES.EMAIL_ALREADY_VERIFIED_BEFORE
     })
   }
-  const result = await usersServices.resendVerifyEmail(user_id)
+  const result = await usersService.resendVerifyEmail(user_id)
   return res.json(result)
 }
 export const forgotPasswordController = async (
@@ -106,7 +106,7 @@ export const forgotPasswordController = async (
   next: NextFunction
 ) => {
   const { _id, verify, email } = req.user as User
-  const result = await usersServices.forgotPassword({ user_id: (_id as ObjectId).toString(), verify, email })
+  const result = await usersService.forgotPassword({ user_id: (_id as ObjectId).toString(), verify, email })
   return res.json(result)
 }
 export const verifyForgotPasswordController = async (
@@ -125,12 +125,12 @@ export const resetPasswordController = async (
 ) => {
   const { user_id } = req.decoded_forgot_password_token as TokenPayload
   const { password } = req.body
-  const result = await usersServices.resetPassword(user_id, password)
+  const result = await usersService.resetPassword(user_id, password)
   return res.json(result)
 }
 export const getMeController = async (req: Request, res: Response, next: NextFunction) => {
   const { user_id } = req.decoded_authorization as TokenPayload
-  const user = await usersServices.getMe(user_id)
+  const user = await usersService.getMe(user_id)
   return res.json({
     message: USERS_MESSAGES.GET_ME_SUCCESS,
     result: user
@@ -143,7 +143,7 @@ export const updateMeController = async (
 ) => {
   const { user_id } = req.decoded_authorization as TokenPayload
   const { body } = req
-  const user = await usersServices.updateMe(user_id, body)
+  const user = await usersService.updateMe(user_id, body)
   return res.json({
     message: USERS_MESSAGES.UPDATE_ME_SUCCESS,
     result: user
@@ -151,7 +151,7 @@ export const updateMeController = async (
 }
 export const getProfileController = async (req: Request<GetProfileReqParams>, res: Response, next: NextFunction) => {
   const { username } = req.params
-  const user = await usersServices.getProfile(username)
+  const user = await usersService.getProfile(username)
   return res.json({
     message: USERS_MESSAGES.GET_PROFILE_SUCCESS,
     result: user
@@ -164,13 +164,13 @@ export const followController = async (
 ) => {
   const { user_id } = req.decoded_authorization as TokenPayload
   const { followed_user_id } = req.body
-  const result = await usersServices.follow(user_id, followed_user_id)
+  const result = await usersService.follow(user_id, followed_user_id)
   return res.json(result)
 }
 export const unfollowController = async (req: Request<UnfollowReqParams>, res: Response, next: NextFunction) => {
   const { user_id } = req.decoded_authorization as TokenPayload
   const { followed_user_id } = req.params
-  const result = await usersServices.unfollow(user_id, followed_user_id)
+  const result = await usersService.unfollow(user_id, followed_user_id)
   return res.json(result)
 }
 export const changePasswordController = async (
@@ -180,6 +180,6 @@ export const changePasswordController = async (
 ) => {
   const { user_id } = req.decoded_authorization as TokenPayload
   const { password } = req.body
-  const result = await usersServices.changePassword(user_id, password)
+  const result = await usersService.changePassword(user_id, password)
   return res.json(result)
 }
