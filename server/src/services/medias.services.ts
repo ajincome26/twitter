@@ -15,8 +15,8 @@ class MediasService {
     await sharp(file.filepath).jpeg().toFile(newPath) // chuyển đổi file chính sang .jpg và lưu ở temp
     await fsPromise.unlink(newPath) // xóa file ở temp
     return isProduction
-      ? `${process.env.HOST}/uploads/${newName}`
-      : `http://localhost:${process.env.PORT}/uploads/${newName}`
+      ? `${process.env.HOST}/static/image/${newName}`
+      : `http://localhost:${process.env.PORT}/static/image/${newName}`
   }
 }
 
