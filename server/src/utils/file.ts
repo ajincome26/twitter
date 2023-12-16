@@ -1,6 +1,6 @@
 import { UPLOAD_IMAGE_TEMP_DIR, UPLOAD_VIDEO_TEMP_DIR } from '~/constants/dir'
 import fs from 'fs'
-import formidable from 'formidable'
+import formidable, { File } from 'formidable'
 import path from 'path'
 import { Request } from 'express'
 
@@ -19,7 +19,7 @@ export const handleUploadImage = async (req: Request) => {
     uploadDir: path.resolve('uploads'),
     maxFiles: 4,
     keepExtensions: true,
-    maxFileSize: 300 * 1024,
+    maxFileSize: 3000 * 1024,
     filter: function ({ name, originalFilename, mimetype }) {
       const valid = name === 'image' && Boolean(mimetype?.includes('image/'))
       if (!valid) {
@@ -28,7 +28,7 @@ export const handleUploadImage = async (req: Request) => {
       return valid
     }
   })
-  return new Promise((resolve, reject) => {
+  return new Promise<File>((resolve, reject) => {
     form.parse(req, (err, fields, files) => {
       if (err) {
         return reject(err)
@@ -37,7 +37,7 @@ export const handleUploadImage = async (req: Request) => {
       if (!Boolean(files.image)) {
         return reject(new Error('File is empty'))
       }
-      resolve(files)
+      resolve((files.image as File[])[0])
     })
   })
 }
