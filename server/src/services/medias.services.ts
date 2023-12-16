@@ -3,6 +3,9 @@ import sharp from 'sharp'
 import { UPLOAD_IMAGE_TEMP_DIR } from '~/constants/dir'
 import { handleUploadImage } from '~/utils/file'
 import fsPromise from 'fs/promises'
+import { isProduction } from '~/constants/config'
+import { config } from 'dotenv'
+config()
 
 class MediasService {
   async uploadImage(req: Request) {
@@ -11,7 +14,9 @@ class MediasService {
     const newPath = UPLOAD_IMAGE_TEMP_DIR + '/' + newName // path tới file lưu tạm trong temp
     await sharp(file.filepath).jpeg().toFile(newPath) // chuyển đổi file chính sang .jpg và lưu ở temp
     await fsPromise.unlink(newPath) // xóa file ở temp
-    return `http://localhost:3000/uploads/${newName}`
+    return isProduction
+      ? `${process.env.HOST}/uploads/${newName}`
+      : `http://localhost:${process.env.PORT}/uploads/${newName}`
   }
 }
 
