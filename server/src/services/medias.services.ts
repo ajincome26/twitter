@@ -5,18 +5,28 @@ import { handleUploadImage } from '~/utils/file'
 import fsPromise from 'fs/promises'
 import { isProduction } from '~/constants/config'
 import { config } from 'dotenv'
+import { MediaType } from '~/constants/enums'
+import { Media } from '~/models/Orther'
 config()
 
 class MediasService {
   async uploadImage(req: Request) {
-    const file = await handleUploadImage(req)
-    const newName = `${file.newFilename.split('.')[0]}.jpg` // tên file được upload lên folder uploads
-    const newPath = UPLOAD_IMAGE_TEMP_DIR + '/' + newName // path tới file lưu tạm trong temp
-    await sharp(file.filepath).jpeg().toFile(newPath) // chuyển đổi file chính sang .jpg và lưu ở temp
-    await fsPromise.unlink(newPath) // xóa file ở temp
-    return isProduction
-      ? `${process.env.HOST}/static/image/${newName}`
-      : `http://localhost:${process.env.PORT}/static/image/${newName}`
+    const files = await handleUploadImage(req)
+    const result: Media[] = await Promise.all(
+      files.map(async (file) => {
+        const newName = `${file.newFilename.split('.')[0]}.jpg` // tên file được upload lên folder uploads
+        const newPath = UPLOAD_IMAGE_TEMP_DIR + '/' + newName // path tới file lưu tạm trong temp
+        await sharp(file.filepath).jpeg().toFile(newPath) // chuyển đổi file chính sang .jpg và lưu ở temp
+        await fsPromise.unlink(newPath) // xóa file ở temp
+        return {
+          url: isProduction
+            ? `${process.env.HOST}/static/image/${newName}`
+            : `http://localhost:${process.env.PORT}/static/image/${newName}`,
+          type: MediaType.Image
+        }
+      })
+    )
+    return result
   }
 }
 
