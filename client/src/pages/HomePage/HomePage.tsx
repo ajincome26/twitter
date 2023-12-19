@@ -37,6 +37,9 @@ const HomePage = () => {
           Login with Google
         </Link>
       )}
+      <video controls width={500}>
+        <source src='http://localhost:4000/static/video-stream/33cbe01f1dde6d43e5650bf00.mp4' type='video/mp4' />
+      </video>
     </div>
   )
 }
