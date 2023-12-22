@@ -15,7 +15,9 @@ const PORT = process.env.PORT || 4000
 // Tạo folder upload
 initFolder()
 
-databaseService.connect()
+databaseService.connect().then(() => {
+  databaseService.indexUsers()
+})
 app.use(express.json())
 
 app.use('/users', usersRouter)

@@ -26,6 +26,29 @@ class DatabaseService {
     }
   }
 
+  async indexUsers() {
+    const exists = await this.users.indexExists(['email_1_password_1', 'email_1', 'username_1'])
+
+    if (!exists) {
+      this.users.createIndex({ email: 1, password: 1 }) // compound
+      this.users.createIndex({ email: 1 }, { unique: true })
+      this.users.createIndex({ username: 1 }, { unique: true })
+    }
+  }
+  async indexRefreshTokens() {
+    const exists = await this.refreshTokens.indexExists(['exp_1', 'token_1'])
+
+    if (!exists) {
+      this.refreshTokens.createIndex({ token: 1 })
+      this.refreshTokens.createIndex(
+        { exp: 1 },
+        {
+          expireAfterSeconds: 0
+        }
+      )
+    }
+  }
+
   // Dựa vào geter, seter để truy cập và thêm, sửa... bảng đó
   get users(): Collection<User> {
     return this.db.collection(process.env.DB_COLLECTION_USERS as string)
