@@ -17,6 +17,8 @@ initFolder()
 
 databaseService.connect().then(() => {
   databaseService.indexUsers()
+  databaseService.indexRefreshTokens()
+  databaseService.indexFollowers()
 })
 app.use(express.json())
 
